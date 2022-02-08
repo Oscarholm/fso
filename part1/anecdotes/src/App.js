@@ -14,6 +14,7 @@ const App = () => {
   const random = Math.floor(Math.random() * length);
   const array = new Array(length);
   for (let i = 0; i < length; i++) array[i] = 0;
+
   const [selected, setSelected] = useState(random);
   const [points, setPoints] = useState(array);
   const [most, setMost] = useState(0);
