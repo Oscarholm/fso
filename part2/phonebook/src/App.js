@@ -1,41 +1,67 @@
-import React, { useState } from "react";
-import Person from "./components/Person";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Persons from "./components/Persons";
+import Filter from "./components/Filter";
+import AddContact from "./components/AddContact";
 
 const App = () => {
-  const [persons, setPersons] = useState([{ name: "Arto Hellas" }]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons").then((response) => {
+      console.log("promise fulfilled");
+      setPersons(response.data);
+    });
+  }, []);
 
   const addPerson = (event) => {
     event.preventDefault();
-    const personObject = {
-      name: newName,
-      id: persons.length + 1,
-    };
-
-    setPersons(persons.concat(personObject));
-    setNewName("");
+    var test = persons.filter((person) => person.name === newName);
+    if (test.length === 0) {
+      const personObject = {
+        name: newName,
+        number: newNumber,
+        id: persons.length + 1,
+      };
+      setPersons(persons.concat(personObject));
+      setNewName("");
+      setNewNumber("");
+    } else {
+      window.alert(`${newName} is already added to phonebook`);
+    }
   };
 
   const handleNameChange = (event) => {
     setNewName(event.target.value);
   };
 
+  const handleNumberChange = (event) => {
+    setNewNumber(event.target.value);
+  };
+
+  const handleSearch = (event) => setSearch(event.target.value);
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Filter
+        search={search}
+        title="filter shown with "
+        handleFunction={handleSearch}
+      />
+      <h2>Add a new contact</h2>
+      <AddContact
+        addPerson={addPerson}
+        newName={newName}
+        handleNameChange={handleNameChange}
+        newNumber={newNumber}
+        handleNumberChange={handleNumberChange}
+      />
       <h2>Numbers</h2>
-      {persons.map((person) => (
-        <Person key={person.name} name={person.name} />
-      ))}
-      <div>debug: {newName}</div>
+      <Persons persons={persons} search={search} />
     </div>
   );
 };
