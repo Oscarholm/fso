@@ -12,7 +12,7 @@ const Weather = ({ lat, lon }) => {
       setWeather(response.data);
     });
   };
-  useEffect(weatherHook, []);
+  useEffect(weatherHook, [api]);
 
   if (weather.length === 0) return <div>Loading</div>;
   const iconUrl =
