@@ -3,12 +3,14 @@ import Persons from "./components/Persons";
 import Filter from "./components/Filter";
 import AddContact from "./components/AddContact";
 import personService from "./services/persons";
+import Notification from "./components/Notifications";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -24,23 +26,48 @@ const App = () => {
         name: newName,
         number: newNumber,
       };
-      personService.create(personObject);
-      setPersons(persons.concat(personObject));
-    } else if (
-      window.confirm(
-        `${newName} is already added to phonebook, replace the old number with a new one?`
-      )
-    ) {
-      const changedPerson = { ...entry[0], number: newNumber };
       personService
-        .update(entry[0].id, changedPerson)
-        .then(
-          setPersons(
-            persons.map((person) =>
-              person.id !== changedPerson.id ? person : changedPerson
-            )
-          )
-        );
+        .create(personObject)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          setErrorMessage(`Added ${returnedPerson.name}`);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          setErrorMessage("We've encountered an error");
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        });
+    } else {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const changedPerson = { ...entry[0], number: newNumber };
+        personService
+          .update(entry[0].id, changedPerson)
+          .then((response) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== changedPerson.id ? person : changedPerson
+              )
+            );
+            setErrorMessage(`Updated ${entry[0].name}`);
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
+          })
+          .catch((error) => {
+            setErrorMessage("We've encountered an error!");
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
+          });
+      }
     }
     setNewName("");
     setNewNumber("");
@@ -52,8 +79,13 @@ const App = () => {
     );
     if (result) {
       console.log(`deleting ${id}`);
-      personService.remove(id);
-      setPersons(persons.filter((person) => person.id !== id));
+      personService.remove(id).then((response) => {
+        setPersons(persons.filter((person) => person.id !== id));
+        setErrorMessage("Contact has been deleted");
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
     }
   };
 
@@ -69,6 +101,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification message={errorMessage} />
       <h2>Phonebook</h2>
       <Filter
         search={search}

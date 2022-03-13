@@ -12,6 +12,7 @@ const Persons = ({ persons, search, deleteContact }) => {
             number={person.number}
             key={person.id}
             deleteContact={() => deleteContact(person.id)}
+            id={person.id}
           />
         ))}
     </div>
