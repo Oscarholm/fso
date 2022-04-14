@@ -36,7 +36,7 @@ const App = () => {
           }, 5000);
         })
         .catch((error) => {
-          setErrorMessage("We've encountered an error");
+          setErrorMessage(error.response.data.error);
           setTimeout(() => {
             setErrorMessage(null);
           }, 5000);
@@ -62,7 +62,7 @@ const App = () => {
             }, 5000);
           })
           .catch((error) => {
-            setErrorMessage("We've encountered an error!");
+            setErrorMessage(error.response.data.error);
             setTimeout(() => {
               setErrorMessage(null);
             }, 5000);
