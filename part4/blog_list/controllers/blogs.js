@@ -23,7 +23,6 @@ blogRouter.get("/:id", async (request, response, next) => {
 blogRouter.post("/", userExtractor, async (request, response, next) => {
   const body = request.body;
   const user = request.user;
-  info("the controller is getting the user:", user);
 
   if (!body.title || !body.url) {
     response.status(400).send("Bad request");
@@ -32,7 +31,7 @@ blogRouter.post("/", userExtractor, async (request, response, next) => {
   } else {
     const blog = new Blog({
       title: body.title,
-      author: user.name,
+      author: body.author || user.username,
       likes: body.likes || 0,
       url: body.url,
       user: user._id,

@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import BlogForm from "./components/BlogForm";
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
@@ -12,7 +14,12 @@ const App = () => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    const getBlogs = async () => {
+      const blogs = await blogService.getAll();
+      blogs.sort((a, b) => (a.likes > b.likes ? -1 : 1));
+      setBlogs(blogs);
+    };
+    getBlogs();
   }, []);
 
   useEffect(() => {
@@ -38,9 +45,12 @@ const App = () => {
       setUser(user);
       setUsername("");
       setPassword("");
-      console.log(user);
+      setErrorMessage(`${user.username} successfully logged in`);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
     } catch (exception) {
-      setErrorMessage("Wrong credentials");
+      setErrorMessage("wrong credentials");
       setTimeout(() => {
         setErrorMessage(null);
       }, 5000);
@@ -49,9 +59,20 @@ const App = () => {
 
   const handleLogout = async (event) => {
     event.preventDefault();
-    setUser(null);
-    blogService.setToken(null);
-    window.localStorage.removeItem("loggedBlogAppUser");
+    try {
+      setUser(null);
+      blogService.setToken(null);
+      window.localStorage.removeItem("loggedBlogAppUser");
+      setErrorMessage("successfully logged out");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    } catch (exception) {
+      setErrorMessage("logout failed");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
   };
 
   const loginForm = () => (
@@ -80,31 +101,81 @@ const App = () => {
     </form>
   );
 
-  const blogForm = () => (
-    <div>
-      <h2>blogs</h2>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
-    </div>
-  );
+  const blogFormRef = useRef();
+
+  const addBlog = async (blogObject) => {
+    try {
+      const blog = await blogService.create(blogObject);
+      setBlogs(blogs.concat(blog));
+      setErrorMessage(`${blogObject.title} by ${blogObject.author} added`);
+      blogFormRef.current.toggleVisibility();
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    } catch {
+      setErrorMessage("failed to add blog");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  };
+
+  const deleteBlog = async (blogObject) => {
+    try {
+      await blogService.deleteBlog(blogObject.id);
+      const newBlogs = blogs.filter((blog) => blog.id !== blogObject.id);
+      setBlogs(newBlogs);
+      setErrorMessage(`${blogObject.title} by ${blogObject.author} deleted`);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    } catch {
+      setErrorMessage("failed to delete blog");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  };
+
+  const likeBlog = () => {
+    const blogId = blog.id;
+    const blogObject = {
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blogLikes + 1,
+      user: blog.user.id,
+    };
+    setBlogLikes(blogObject.likes);
+    blogService.likeBlog(blogId, blogObject);
+  };
 
   return (
     <div>
-      <Notification message={errorMessage} />
       {user === null ? (
         loginForm()
       ) : (
         <div>
-          {user.username} is logged in
+          <h1>Blogs</h1>
           <form onSubmit={handleLogout}>
-            <button type="submit">Logout</button>
+            {user.username} is logged in
+            <button type="submit">logout</button>
           </form>
-          {blogForm()}
+          <Notification message={errorMessage} />
+          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+            <BlogForm addBlog={addBlog} />
+          </Togglable>
+          {blogs.map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              deleteBlog={deleteBlog}
+              user={user}
+            />
+          ))}
         </div>
       )}
     </div>
   );
 };
-
 export default App;

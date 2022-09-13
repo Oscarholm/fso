@@ -41,7 +41,6 @@ const mostBlogs = (blogs) => {
       topAuthor = author;
     }
   }
-  console.log(topAuthor);
   return topAuthor;
 };
 
@@ -64,7 +63,6 @@ const mostLikes = (blogs) => {
       topAuthor = author;
     }
   }
-  console.log(topAuthor);
   return {
     author: topAuthor,
     likes: max,
