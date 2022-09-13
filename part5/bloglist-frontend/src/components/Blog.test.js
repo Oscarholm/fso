@@ -7,7 +7,7 @@ import userEvent from "@testing-library/user-event";
 
 describe("<Blog />", () => {
   let container;
-
+  let mockHandler;
   const blog = {
     title: "Test book",
     author: "JK Tester",
@@ -20,7 +20,10 @@ describe("<Blog />", () => {
     username: "Oscar",
   };
   beforeEach(() => {
-    container = render(<Blog blog={blog} user={user} />).container;
+    mockHandler = jest.fn();
+    container = render(
+      <Blog blog={blog} user={user} likeBlog={mockHandler} />
+    ).container;
   });
 
   test("renders title and author but not url or likes", () => {
@@ -47,10 +50,8 @@ describe("<Blog />", () => {
   });
 
   test("if button is clicked twice, handler is called twice", async () => {
-    const mockHandler = jest.fn();
     const toggleDisplay = userEvent.setup();
-    const button = screen.getByText("view");
-
+    const button = screen.getByText("like");
     await toggleDisplay.click(button);
     await toggleDisplay.click(button);
     expect(mockHandler.mock.calls).toHaveLength(2);

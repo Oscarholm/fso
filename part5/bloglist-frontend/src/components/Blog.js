@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import blogService from "../services/blogs";
 
-const Blog = ({ blog, deleteBlog, user }) => {
+const Blog = ({ blog, deleteBlog, user, likeBlog }) => {
   const [blogLikes, setBlogLikes] = useState("");
   const [blogVisible, setBlogVisible] = useState(false);
   const hideWhenVisible = { display: blogVisible ? "none" : "" };
@@ -31,7 +30,15 @@ const Blog = ({ blog, deleteBlog, user }) => {
     setBlogVisible(!blogVisible);
   };
 
-  const likeBlog = () => {
+  const handleRemove = (event) => {
+    event.preventDefault();
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      deleteBlog(blog);
+    }
+  };
+
+  const handleLike = (event) => {
+    event.preventDefault();
     const blogId = blog.id;
     const blogObject = {
       title: blog.title,
@@ -41,15 +48,9 @@ const Blog = ({ blog, deleteBlog, user }) => {
       user: blog.user.id,
     };
     setBlogLikes(blogObject.likes);
-    blogService.likeBlog(blogId, blogObject);
+    likeBlog(blogId, blogObject);
   };
 
-  const handleRemove = (event) => {
-    event.preventDefault();
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      deleteBlog(blog);
-    }
-  };
   return (
     <div className="blog">
       <div className="blogHeader" style={hideWhenVisible}>
@@ -62,7 +63,7 @@ const Blog = ({ blog, deleteBlog, user }) => {
           &nbsp;<button onClick={toggleVisibility}>hide</button>
           <br />
           {blog.url} <br />
-          likes {blogLikes} <button onClick={likeBlog}>like</button>
+          likes {blogLikes} <button onClick={handleLike}>like</button>
           <br />
           {blog.author} <br />
           <button style={removeButton} onClick={handleRemove}>

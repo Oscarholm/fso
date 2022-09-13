@@ -137,17 +137,8 @@ const App = () => {
     }
   };
 
-  const likeBlog = () => {
-    const blogId = blog.id;
-    const blogObject = {
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: blogLikes + 1,
-      user: blog.user.id,
-    };
-    setBlogLikes(blogObject.likes);
-    blogService.likeBlog(blogId, blogObject);
+  const likeBlog = async (blogId, blogObject) => {
+    await blogService.likeBlog(blogId, blogObject);
   };
 
   return (
@@ -171,6 +162,7 @@ const App = () => {
               blog={blog}
               deleteBlog={deleteBlog}
               user={user}
+              likeBlog={likeBlog}
             />
           ))}
         </div>
