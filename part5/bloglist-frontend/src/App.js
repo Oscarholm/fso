@@ -5,6 +5,7 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import LoginForm from "./components/LoginForm";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -75,36 +76,6 @@ const App = () => {
     }
   };
 
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <h2>Log in to application</h2>
-      <Notification message={errorMessage} />
-      <div>
-        username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          id="username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          id="password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit" id="login-button">
-        login
-      </button>
-    </form>
-  );
-
   const blogFormRef = useRef();
 
   const addBlog = async (blogObject) => {
@@ -148,7 +119,14 @@ const App = () => {
   return (
     <div>
       {user === null ? (
-        loginForm()
+        <LoginForm
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}
+          handleLogin={handleLogin}
+          errorMessage={errorMessage}
+        />
       ) : (
         <div>
           <h1>Blogs</h1>
@@ -157,18 +135,20 @@ const App = () => {
             <button type="submit">logout</button>
           </form>
           <Notification message={errorMessage} />
-          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+          <Togglable id="new-blog" buttonLabel="new blog" ref={blogFormRef}>
             <BlogForm addBlog={addBlog} />
           </Togglable>
-          {blogs.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              deleteBlog={deleteBlog}
-              user={user}
-              likeBlog={likeBlog}
-            />
-          ))}
+          <div>
+            {blogs.map((blog) => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                deleteBlog={deleteBlog}
+                user={user}
+                likeBlog={likeBlog}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

@@ -29,6 +29,7 @@ const BlogForm = ({ addBlog }) => {
             name="Title"
             onChange={({ target }) => setTitle(target.value)}
             placeholder="Harry Potter"
+            id="title"
           />
         </div>
         <div>
@@ -39,6 +40,7 @@ const BlogForm = ({ addBlog }) => {
             name="Author"
             onChange={({ target }) => setAuthor(target.value)}
             placeholder="JK Rowlings"
+            id="author"
           />
         </div>
         <div>
@@ -49,9 +51,12 @@ const BlogForm = ({ addBlog }) => {
             name="Url"
             onChange={({ target }) => setUrl(target.value)}
             placeholder="www.harrypotter.co.uk"
+            id="url"
           />
         </div>
-        <button type="submit">create</button>
+        <button type="submit" id="submit-button">
+          create
+        </button>
       </form>
     </div>
   );
