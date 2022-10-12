@@ -14,11 +14,16 @@ const AnecdoteList = () => {
     a.votes > b.votes ? -1 : 1
   );
   const dispatch = useDispatch();
+  const notification = useSelector((state) => state.notification);
 
   const handleVote = (anecdote) => {
     const message = `you voted '${anecdote.content}'`;
+    // if there's a current notification, clear it before creating new one
+    if (notification) {
+      clearTimeout(notification.timeoutID);
+    }
     dispatch(incrementVotes(anecdote));
-    dispatch(notify(message, 5));
+    dispatch(notify(message, 10));
   };
 
   return (

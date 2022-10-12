@@ -5,16 +5,6 @@ const anecdoteSlice = createSlice({
   name: "anecdotes",
   initialState: [],
   reducers: {
-    // increaseVotes was replaced by initializeVotes -> setAnecdotes. Cleaner, but better?
-    // increaseVotes(state, action) {
-    //   const id = action.payload;
-    //   const anecdoteToChange = state.find((a) => a.id === id);
-    //   const updatedAnecdote = {
-    //     ...anecdoteToChange,
-    //     votes: anecdoteToChange.votes + 1,
-    //   };
-    //   return state.map((a) => (a.id !== id ? a : updatedAnecdote));
-    // },
     appendAnecdote(state, action) {
       state.push(action.payload);
     },
