@@ -28,7 +28,6 @@ export const notify = (content, time) => {
       dispatch(resetNotification());
     }, time * 1000);
     dispatch(updateNotification({ content, timeoutID }));
-    return timeoutID;
   };
 };
 export default notificationSlice.reducer;
