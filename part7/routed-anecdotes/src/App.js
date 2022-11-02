@@ -7,6 +7,7 @@ import {
   useParams,
   useNavigate,
 } from "react-router-dom";
+import { useField } from "./hooks";
 
 const Menu = () => {
   const padding = {
@@ -41,7 +42,6 @@ const AnecdoteList = ({ anecdotes }) => (
 );
 
 const Anecdote = ({ anecdotes }) => {
-  // useParams not giving any id at this point
   const id = useParams().id;
   const anecdote = anecdotes.find((a) => a.id === Number(id));
   return (
@@ -89,10 +89,10 @@ const Footer = () => (
 );
 
 const CreateNew = ({ addNew }) => {
-  const [content, setContent] = useState("");
-  const [author, setAuthor] = useState("");
-  const [info, setInfo] = useState("");
   const navigate = useNavigate();
+  const content = useField("text");
+  const author = useField("text");
+  const info = useField("text");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -105,35 +105,33 @@ const CreateNew = ({ addNew }) => {
     navigate("/");
   };
 
+  const handleReset = (e) => {
+    e.preventDefault();
+    content.clear();
+    author.clear();
+    info.clear();
+  };
+
   return (
     <div>
       <h2>create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input
-            name="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
+          <input {...content.input} />
         </div>
         <div>
           author
-          <input
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          />
+          <input {...author.input} />
         </div>
         <div>
           url for more info
-          <input
-            name="info"
-            value={info}
-            onChange={(e) => setInfo(e.target.value)}
-          />
+          <input {...info.input} />
         </div>
         <button>create</button>
+      </form>
+      <form onSubmit={handleReset}>
+        <button>reset</button>
       </form>
     </div>
   );
