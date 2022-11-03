@@ -1,0 +1,60 @@
+{
+  "notes": [
+    {
+      "content": "custom-hooks are great",
+      "id": 1
+    },
+    {
+      "content": "the best featrure ever <3",
+      "id": 2
+    },
+    {
+      "content": "Creating a new note",
+      "id": 3
+    },
+    {
+      "content": "Seems to be working",
+      "id": 4
+    },
+    {
+      "content": "PLease no error",
+      "id": 5
+    },
+    {
+      "content": "Now with concatenate",
+      "id": 6
+    }
+  ],
+  "persons": [
+    {
+      "name": "mluukkai",
+      "number": "040-5483923",
+      "id": 1
+    },
+    {
+      "name": "kaltsoon",
+      "number": "045-2323456",
+      "id": 2
+    },
+    {
+      "name": "Oscar",
+      "number": "040158821",
+      "id": 3
+    },
+    {
+      "name": "Oscar",
+      "number": "040-158821",
+      "id": 4
+    },
+    {
+      "name": "Erik",
+      "number": "150358",
+      "id": 5
+    },
+    {
+      "name": "Johan",
+      "number": "040-150358",
+      "id": 6
+    }
+  ]
+}
