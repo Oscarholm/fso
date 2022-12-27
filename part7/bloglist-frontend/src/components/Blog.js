@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { like } from "../reducers/blogReducer";
 
-const Blog = ({ blog, deleteBlog, user, likeBlog }) => {
-  const [blogLikes, setBlogLikes] = useState("");
+const Blog = ({ blog, deleteBlog, user }) => {
   const [blogVisible, setBlogVisible] = useState(false);
   const hideWhenVisible = { display: blogVisible ? "none" : "" };
   const showWhenVisible = { display: blogVisible ? "" : "none" };
@@ -14,9 +15,7 @@ const Blog = ({ blog, deleteBlog, user, likeBlog }) => {
     display: user.id === blog.user.id || user.id === blog.user ? "" : "none",
   };
 
-  useEffect(() => {
-    setBlogLikes(blog.likes);
-  }, [setBlogLikes, blog.likes]);
+  const dispatch = useDispatch();
 
   const blogStyle = {
     paddingTop: 10,
@@ -40,15 +39,7 @@ const Blog = ({ blog, deleteBlog, user, likeBlog }) => {
   const handleLike = (event) => {
     event.preventDefault();
     const blogId = blog.id;
-    const blogObject = {
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: blogLikes + 1,
-      user: blog.user.id,
-    };
-    setBlogLikes(blogObject.likes);
-    likeBlog(blogId, blogObject);
+    dispatch(like(blogId, blog));
   };
 
   return (
@@ -63,7 +54,7 @@ const Blog = ({ blog, deleteBlog, user, likeBlog }) => {
           &nbsp;<button onClick={toggleVisibility}>hide</button>
           <br />
           {blog.url} <br />
-          likes {blogLikes}{" "}
+          likes {blog.likes}{" "}
           <button id="like-button" onClick={handleLike}>
             like
           </button>

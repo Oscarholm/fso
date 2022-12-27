@@ -26,7 +26,6 @@ const App = () => {
   }, [dispatch]);
 
   const blogs = useSelector((state) => state.blogs);
-  console.log("from app.js ", blogs);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
@@ -73,7 +72,6 @@ const App = () => {
 
   const addBlog = async (blogObject) => {
     try {
-      console.log("this is the blogObject: ", blogObject);
       dispatch(createBlog(blogObject));
       dispatch(
         setNotifications(`${blogObject.title} by ${blogObject.author} added`)
@@ -95,10 +93,6 @@ const App = () => {
     } catch (err) {
       dispatch(setNotifications("failed to delete blog"));
     }
-  };
-
-  const likeBlog = async (blogId, blogObject) => {
-    await blogService.likeBlog(blogId, blogObject);
   };
 
   return (
@@ -130,7 +124,6 @@ const App = () => {
                 blog={blog}
                 deleteBlog={deleteBlog}
                 user={user}
-                likeBlog={likeBlog}
               />
             ))}
           </div>
