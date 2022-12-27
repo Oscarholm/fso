@@ -6,22 +6,27 @@ import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import LoginForm from "./components/LoginForm";
+import { useDispatch, useSelector } from "react-redux";
+import { setNotifications } from "./reducers/notificationReducer";
+import { createBlog, initializeBlogs } from "./reducers/blogReducer";
+
+// Next step is to fix create blog with redux store
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
+  const [setBlogs] = useState([]);
   const [user, setUser] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const dispatch = useDispatch();
+  const notification = useSelector((state) => state.notification);
+
   useEffect(() => {
-    const getBlogs = async () => {
-      const blogs = await blogService.getAll();
-      blogs.sort((a, b) => (a.likes > b.likes ? -1 : 1));
-      setBlogs(blogs);
-    };
-    getBlogs();
-  }, []);
+    dispatch(initializeBlogs());
+  }, [dispatch]);
+
+  const blogs = useSelector((state) => state.blogs);
+  console.log("from app.js ", blogs);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
@@ -46,15 +51,9 @@ const App = () => {
       setUser(user);
       setUsername("");
       setPassword("");
-      setErrorMessage(`${user.username} successfully logged in`);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(setNotifications(`${user.username} successfully logged in`));
     } catch (exception) {
-      setErrorMessage("wrong credentials");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(setNotifications("wrong credentials"));
     }
   };
 
@@ -64,15 +63,9 @@ const App = () => {
       setUser(null);
       blogService.setToken(null);
       window.localStorage.removeItem("loggedBlogAppUser");
-      setErrorMessage("successfully logged out");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(setNotifications("successfully loggedout"));
     } catch (exception) {
-      setErrorMessage("logout failed");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(setNotifications("logout failed"));
     }
   };
 
@@ -80,18 +73,14 @@ const App = () => {
 
   const addBlog = async (blogObject) => {
     try {
-      const blog = await blogService.create(blogObject);
-      setBlogs(blogs.concat(blog));
-      setErrorMessage(`${blogObject.title} by ${blogObject.author} added`);
+      console.log("this is the blogObject: ", blogObject);
+      dispatch(createBlog(blogObject));
+      dispatch(
+        setNotifications(`${blogObject.title} by ${blogObject.author} added`)
+      );
       blogFormRef.current.toggleVisibility();
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
     } catch (err) {
-      setErrorMessage("failed to add blog");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(setNotifications("failed to add blog"));
     }
   };
 
@@ -100,15 +89,11 @@ const App = () => {
       await blogService.deleteBlog(blogObject.id);
       const newBlogs = blogs.filter((blog) => blog.id !== blogObject.id);
       setBlogs(newBlogs);
-      setErrorMessage(`${blogObject.title} by ${blogObject.author} deleted`);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(
+        setNotifications(`${blogObject.title} by ${blogObject.author} deleted`)
+      );
     } catch (err) {
-      setErrorMessage("failed to delete blog");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(setNotifications("failed to delete blog"));
     }
   };
 
@@ -125,7 +110,7 @@ const App = () => {
           password={password}
           setPassword={setPassword}
           handleLogin={handleLogin}
-          errorMessage={errorMessage}
+          errorMessage={notification}
         />
       ) : (
         <div>
@@ -134,7 +119,7 @@ const App = () => {
             {user.username} is logged in
             <button type="submit">logout</button>
           </form>
-          <Notification message={errorMessage} />
+          <Notification message={notification} />
           <Togglable id="new-blog" buttonLabel="new blog" ref={blogFormRef}>
             <BlogForm addBlog={addBlog} />
           </Togglable>
