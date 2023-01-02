@@ -3,20 +3,18 @@ import BlogForm from "./components/BlogForm";
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
-import blogService from "./services/blogs";
-import loginService from "./services/login";
 import LoginForm from "./components/LoginForm";
 import { useDispatch, useSelector } from "react-redux";
-import { setNotifications } from "./reducers/notificationReducer";
 import { initializeBlogs } from "./reducers/blogReducer";
+import { login, logout, setUser } from "./reducers/userReducer";
 
 const App = () => {
-  const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification);
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(initializeBlogs());
@@ -26,43 +24,27 @@ const App = () => {
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
+
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-      blogService.setToken(user.token);
+      dispatch(setUser(loggedUserJSON));
     }
   }, []);
 
   const handleLogin = async (event) => {
     event.preventDefault();
-
-    try {
-      const user = await loginService.login({
+    dispatch(
+      login({
         username,
         password,
-      });
-
-      window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
-      blogService.setToken(user.token);
-      setUser(user);
-      setUsername("");
-      setPassword("");
-      dispatch(setNotifications(`${user.username} successfully logged in`));
-    } catch (exception) {
-      dispatch(setNotifications("wrong credentials"));
-    }
+      })
+    );
   };
 
   const handleLogout = async (event) => {
     event.preventDefault();
-    try {
-      setUser(null);
-      blogService.setToken(null);
-      window.localStorage.removeItem("loggedBlogAppUser");
-      dispatch(setNotifications("successfully loggedout"));
-    } catch (exception) {
-      dispatch(setNotifications("logout failed"));
-    }
+    dispatch(logout());
+    setUsername("");
+    setPassword("");
   };
 
   const blogFormRef = useRef();
