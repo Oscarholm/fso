@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { like } from "../reducers/blogReducer";
+import { deleteBlog, like } from "../reducers/blogReducer";
 
-const Blog = ({ blog, deleteBlog, user }) => {
+const Blog = ({ blog, user }) => {
   const [blogVisible, setBlogVisible] = useState(false);
   const hideWhenVisible = { display: blogVisible ? "none" : "" };
   const showWhenVisible = { display: blogVisible ? "" : "none" };
@@ -32,7 +32,7 @@ const Blog = ({ blog, deleteBlog, user }) => {
   const handleRemove = (event) => {
     event.preventDefault();
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      deleteBlog(blog);
+      dispatch(deleteBlog(blog));
     }
   };
 

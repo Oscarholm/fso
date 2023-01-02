@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs";
+import { setNotifications } from "./notificationReducer";
+// import { setNotifications } from "./notificationReducer";
 
 const blogSlice = createSlice({
   name: "blogs",
@@ -15,6 +17,12 @@ const blogSlice = createSlice({
       const changedBlog = action.payload;
       const id = changedBlog.id;
       return state.map((blog) => (blog.id !== id ? blog : changedBlog));
+    },
+    removeBlog(state, action) {
+      const id = action.payload.id;
+      const newArray = state.filter((blog) => blog.id !== id);
+      console.log("This is the new array ", newArray);
+      return newArray;
     },
   },
 });
@@ -32,8 +40,26 @@ export const like = (objectId, blogObject) => {
 
 export const createBlog = (blogObject) => {
   return async (dispatch) => {
-    let blog = await blogService.create(blogObject);
-    dispatch(appendBlog(blog));
+    try {
+      let blog = await blogService.create(blogObject);
+      dispatch(appendBlog(blog));
+      dispatch(setNotifications(`Successfully added ${blog.title}`));
+    } catch (erro) {
+      dispatch(setNotifications("Failed to add new blog post"));
+    }
+  };
+};
+
+export const deleteBlog = (blog) => {
+  console.log("deleteBlog receives ", blog);
+  return async (dispatch) => {
+    try {
+      dispatch(removeBlog(blog));
+      await blogService.deleteBlog(blog.id);
+      dispatch(setNotifications(`Successfully removed ${blog.title}`));
+    } catch (err) {
+      dispatch(setNotifications(`Failed to remove ${blog.title}`));
+    }
   };
 };
 
@@ -46,4 +72,4 @@ export const initializeBlogs = () => {
 };
 
 export default blogSlice.reducer;
-export const { appendBlog, setBlogs, addLike } = blogSlice.actions;
+export const { appendBlog, setBlogs, addLike, removeBlog } = blogSlice.actions;

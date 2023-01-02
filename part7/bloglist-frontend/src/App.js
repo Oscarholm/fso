@@ -8,12 +8,9 @@ import loginService from "./services/login";
 import LoginForm from "./components/LoginForm";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotifications } from "./reducers/notificationReducer";
-import { createBlog, initializeBlogs } from "./reducers/blogReducer";
-
-// Next step is to fix create blog with redux store
+import { initializeBlogs } from "./reducers/blogReducer";
 
 const App = () => {
-  const [setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -70,31 +67,6 @@ const App = () => {
 
   const blogFormRef = useRef();
 
-  const addBlog = async (blogObject) => {
-    try {
-      dispatch(createBlog(blogObject));
-      dispatch(
-        setNotifications(`${blogObject.title} by ${blogObject.author} added`)
-      );
-      blogFormRef.current.toggleVisibility();
-    } catch (err) {
-      dispatch(setNotifications("failed to add blog"));
-    }
-  };
-
-  const deleteBlog = async (blogObject) => {
-    try {
-      await blogService.deleteBlog(blogObject.id);
-      const newBlogs = blogs.filter((blog) => blog.id !== blogObject.id);
-      setBlogs(newBlogs);
-      dispatch(
-        setNotifications(`${blogObject.title} by ${blogObject.author} deleted`)
-      );
-    } catch (err) {
-      dispatch(setNotifications("failed to delete blog"));
-    }
-  };
-
   return (
     <div>
       {user === null ? (
@@ -115,16 +87,11 @@ const App = () => {
           </form>
           <Notification message={notification} />
           <Togglable id="new-blog" buttonLabel="new blog" ref={blogFormRef}>
-            <BlogForm addBlog={addBlog} />
+            <BlogForm />
           </Togglable>
           <div>
             {blogs.map((blog) => (
-              <Blog
-                key={blog.id}
-                blog={blog}
-                deleteBlog={deleteBlog}
-                user={user}
-              />
+              <Blog key={blog.id} blog={blog} user={user} />
             ))}
           </div>
         </div>
