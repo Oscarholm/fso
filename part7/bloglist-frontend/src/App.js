@@ -1,83 +1,70 @@
-import { useState, useEffect, useRef } from "react";
-import BlogForm from "./components/BlogForm";
-import Blog from "./components/Blog";
-import Notification from "./components/Notification";
-import Togglable from "./components/Togglable";
-import LoginForm from "./components/LoginForm";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { logout, setUser } from "./reducers/userReducer";
+import { Link, Route, Routes } from "react-router-dom";
+import Home from "./views/Home";
+import LoginForm from "./components/LoginForm";
+import Notification from "./components/Notification";
+import Users from "./components/Users";
+import Blogs from "./views/Blogs";
 import { initializeBlogs } from "./reducers/blogReducer";
-import { login, logout, setUser } from "./reducers/userReducer";
+import Blog from "./views/Blog";
 
 const App = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
   const dispatch = useDispatch();
-  const notification = useSelector((state) => state.notification);
   const user = useSelector((state) => state.user);
-
-  useEffect(() => {
-    dispatch(initializeBlogs());
-  }, [dispatch]);
-
-  const blogs = useSelector((state) => state.blogs);
+  const notification = useSelector((state) => state.notification);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
+    dispatch(initializeBlogs());
 
     if (loggedUserJSON) {
       dispatch(setUser(loggedUserJSON));
     }
-  }, []);
+  }, [dispatch]);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    dispatch(
-      login({
-        username,
-        password,
-      })
-    );
+  const padding = {
+    padding: 5,
   };
 
-  const handleLogout = async (event) => {
-    event.preventDefault();
+  const handleLogout = () => {
     dispatch(logout());
-    setUsername("");
-    setPassword("");
   };
-
-  const blogFormRef = useRef();
 
   return (
     <div>
-      {user === null ? (
-        <LoginForm
-          username={username}
-          setUsername={setUsername}
-          password={password}
-          setPassword={setPassword}
-          handleLogin={handleLogin}
-          errorMessage={notification}
-        />
-      ) : (
-        <div>
-          <h1>Blogs</h1>
-          <form onSubmit={handleLogout}>
-            {user.username} is logged in
-            <button type="submit">logout</button>
-          </form>
-          <Notification message={notification} />
-          <Togglable id="new-blog" buttonLabel="new blog" ref={blogFormRef}>
-            <BlogForm />
-          </Togglable>
+      <Notification message={notification} />
+      <div>
+        <Link style={padding} to="/">
+          Home
+        </Link>
+        <Link style={padding} to="/blogs">
+          Blogs
+        </Link>
+        <Link style={padding} to="/users">
+          Users
+        </Link>
+        {user ? (
           <div>
-            {blogs.map((blog) => (
-              <Blog key={blog.id} blog={blog} user={user} />
-            ))}
+            <em>{user.username} logged in</em>
+            <br />
+            <button onClick={handleLogout}>logout</button>
           </div>
-        </div>
-      )}
+        ) : (
+          <Link style={padding} to="/login">
+            Login
+          </Link>
+        )}
+      </div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/users/:id" element={<Blogs />} />
+        <Route path="/blog/:id" element={<Blog />} />
+      </Routes>
     </div>
   );
 };
