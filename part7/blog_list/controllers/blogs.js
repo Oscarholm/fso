@@ -5,15 +5,20 @@ const User = require("../models/user");
 const { info } = require("../utils/logger");
 const jwt = require("jsonwebtoken");
 const { userExtractor } = require("../utils/middleware");
+const Comment = require("../models/comment");
 
 blogRouter.get("/", async (request, response) => {
-  const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
+  const blogs = await Blog.find({})
+    .populate("user", { username: 1, name: 1 })
+    .populate("comments", { comment: 1 });
   response.json(blogs);
 });
 
 blogRouter.get("/:id", async (request, response, next) => {
   try {
-    const blog = await Blog.findById(request.params.id);
+    const blog = await Blog.findById(request.params.id).populate("comments", {
+      comment: 1,
+    });
     response.json(blog);
   } catch (exception) {
     next(exception);
@@ -35,6 +40,7 @@ blogRouter.post("/", userExtractor, async (request, response, next) => {
       likes: body.likes || 0,
       url: body.url,
       user: user._id,
+      comments: body.comment || [],
     });
     try {
       const savedBlog = await blog.save();
@@ -68,12 +74,37 @@ blogRouter.put("/:id", async (request, response, next) => {
     author: body.author,
     likes: body.likes,
     url: body.url,
+    comments: body.comment,
   };
   try {
     await Blog.findByIdAndUpdate(request.params.id, updatedBlog, { new: true });
     response.json(updatedBlog);
   } catch (exception) {
     next(exception);
+  }
+});
+
+blogRouter.post("/:id/comments", async (request, response, next) => {
+  const body = request.body;
+  const blog = await Blog.findById(request.params.id);
+
+  if (!body.comment) {
+    response.status(400).send("Bad request");
+  } else {
+    const comment = new Comment({
+      comment: body.comment,
+      blog: blog._id,
+    });
+
+    try {
+      const savedComment = await comment.save();
+      console.log(savedComment._id);
+      blog.comments = blog.comments.concat(savedComment._id);
+      await blog.save();
+      response.status(201).json(savedComment);
+    } catch (exception) {
+      next(exception);
+    }
   }
 });
 
