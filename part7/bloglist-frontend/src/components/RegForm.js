@@ -1,3 +1,4 @@
+import { Button, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setNotifications } from "../reducers/notificationReducer";
@@ -30,22 +31,21 @@ const RegForm = () => {
 
   return (
     <div>
-      <h2>create new</h2>
+      <Typography variant="h6">create new</Typography>
       <form onSubmit={handleRegistration}>
         <div>
-          username
-          <input
+          <TextField
+            label="username"
             type="text"
             value={username}
             name="username"
             onChange={({ target }) => setUsername(target.value)}
-            placeholder="HarryP"
-            id="username"
+            id="regUsername"
           />
         </div>
         <div>
-          name
-          <input
+          <TextField
+            label="full name"
             type="name"
             value={name}
             name="name"
@@ -55,19 +55,19 @@ const RegForm = () => {
           />
         </div>
         <div>
-          password
-          <input
+          <TextField
+            label="password"
             type="password"
             value={password}
             name="password"
             onChange={({ target }) => setPassword(target.value)}
             placeholder="enter password"
-            id="password"
+            id="regPassword"
           />
         </div>
-        <button type="submit" id="submit-button">
+        <Button variant="contained" type="submit" id="submit-button">
           register
-        </button>
+        </Button>
       </form>
     </div>
   );

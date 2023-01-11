@@ -1,5 +1,7 @@
+import { Button, TextField, Typography } from "@mui/material";
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { login } from "../reducers/userReducer";
 import RegForm from "./RegForm";
 import Togglable from "./Togglable";
@@ -10,18 +12,20 @@ const LoginForm = () => {
 
   const dispatch = useDispatch();
   const registrationRef = useRef();
+  const navigate = useNavigate();
 
   const onSubmit = (event) => {
     event.preventDefault();
     dispatch(login({ username, password }));
+    navigate("/");
   };
   return (
     <div>
       <form onSubmit={onSubmit}>
-        <h2>Log in to application</h2>
+        <Typography variant="h6">Log in to application</Typography>
         <div>
-          username
-          <input
+          <TextField
+            label="username"
             type="text"
             value={username}
             name="Username"
@@ -30,8 +34,8 @@ const LoginForm = () => {
           />
         </div>
         <div>
-          password
-          <input
+          <TextField
+            label="password"
             type="password"
             value={password}
             name="Password"
@@ -39,9 +43,16 @@ const LoginForm = () => {
             id="password"
           />
         </div>
-        <button type="submit" id="login-button">
-          login
-        </button>
+        <div>
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            id="login-button"
+          >
+            Login
+          </Button>
+        </div>
       </form>
       <p>Not registered?</p>
       <Togglable id="register" buttonLabel="Register" ref={registrationRef}>

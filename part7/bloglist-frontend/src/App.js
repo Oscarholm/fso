@@ -9,6 +9,7 @@ import Users from "./components/Users";
 import Blogs from "./views/Blogs";
 import { initializeBlogs } from "./reducers/blogReducer";
 import Blog from "./views/Blog";
+import { AppBar, Button, Container, IconButton, Toolbar } from "@mui/material";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -24,18 +25,49 @@ const App = () => {
     }
   }, [dispatch]);
 
-  const padding = {
-    padding: 5,
-  };
+  // const padding = {
+  //   padding: 5,
+  // };
 
   const handleLogout = () => {
     dispatch(logout());
   };
 
   return (
-    <div>
+    <Container>
       <Notification message={notification} />
-      <div>
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+          ></IconButton>
+          <Button component={Link} to="/" color="inherit">
+            home
+          </Button>
+          <Button component={Link} to="/blogs" color="inherit">
+            blogs
+          </Button>
+          <Button component={Link} to="/users" color="inherit">
+            users
+          </Button>
+
+          {user ? (
+            <div>
+              <em>{user.username} logged in</em>
+              <Button onClick={handleLogout} color="inherit">
+                log out
+              </Button>
+            </div>
+          ) : (
+            <Button>
+              <Link to="/login">login</Link>
+            </Button>
+          )}
+        </Toolbar>
+      </AppBar>
+      {/* <div>
         <Link style={padding} to="/">
           Home
         </Link>
@@ -56,7 +88,7 @@ const App = () => {
             Login
           </Link>
         )}
-      </div>
+      </div> */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />
@@ -65,7 +97,7 @@ const App = () => {
         <Route path="/users/:id" element={<Blogs />} />
         <Route path="/blog/:id" element={<Blog />} />
       </Routes>
-    </div>
+    </Container>
   );
 };
 export default App;

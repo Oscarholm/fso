@@ -1,3 +1,11 @@
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
@@ -27,13 +35,20 @@ const Blogs = () => {
     <div>
       {user === null ? <h1>All blogs</h1> : <h1>{user.username}</h1>}
       <div>
-        <ul>
-          {blogs.map((blog) => (
-            <li key={blog.id}>
-              <Link to={`/blog/${blog.id}`}>{blog.title}</Link>
-            </li>
-          ))}
-        </ul>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              {blogs.map((blog) => (
+                <TableRow key={blog.id}>
+                  <TableCell>
+                    <Link to={`/blog/${blog.id}`}>{blog.title}</Link>
+                  </TableCell>
+                  <TableCell>by {blog.author}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </div>
     </div>
   );
