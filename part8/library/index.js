@@ -161,13 +161,14 @@ const resolvers = {
   },
   Mutation: {
     addBook: (root, args) => {
+        console.log("addBook data received: ", args)
       if (books.find((b) => b.title === args.title)) {
         throw new UserInputError("Title must be unique", {
           invalidArgs: args.title,
         });
       }
       if (!authors.find((a) => a.name === args.author)) {
-        authors = authors.concat({ name: args.author });
+        authors = authors.concat({ name: args.author, id: uuid()  });
       }
       const book = { ...args, id: uuid() };
       books = books.concat(book);
